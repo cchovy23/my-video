@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chromebook Video Player</title>
+    <style>
+        body { font-family: sans-serif; background: #111; color: white; text-align: center; }
+        .container { padding: 50px; }
+        input { padding: 10px; width: 60%; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; cursor: pointer; background: #ff0000; color: white; border: none; border-radius: 5px; }
+        #results { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; }
+        iframe { width: 80%; height: 450px; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Invidious Lite Player</h1>
+        <p>인비디어스 API를 이용한 크롬북 전용 시청기</p>
+        
+        <input type="text" id="query" placeholder="검색어나 유튜브 URL을 입력하세요">
+        <button onclick="search()">검색</button>
+
+        <div id="video-container">
+            <iframe id="player" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        function search() {
+            const q = document.getElementById('query').value;
+            const player = document.getElementById('player');
+            
+            // 유튜브 URL에서 ID만 추출하는 간단한 로직
+            let videoId = q;
+            if(q.includes('v=')) {
+                videoId = q.split('v=')[1].split('&')[0];
+            } else if(q.includes('youtu.be/')) {
+                videoId = q.split('youtu.be/')[1];
+            }
+
+            // 인비디어스 공개 인스턴스(yewtu.be)를 사용하여 영상 재생
+            player.src = `https://yewtu.be/embed/${videoId}`;
+            player.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
