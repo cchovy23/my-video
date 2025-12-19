@@ -3,46 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Chromebook Video Player</title>
+    <title>My Chromebook Player (Piped)</title>
     <style>
-        body { font-family: sans-serif; background: #111; color: white; text-align: center; }
-        .container { padding: 50px; }
-        input { padding: 10px; width: 60%; border-radius: 5px; border: none; }
-        button { padding: 10px 20px; cursor: pointer; background: #ff0000; color: white; border: none; border-radius: 5px; }
-        #results { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; }
-        iframe { width: 80%; height: 450px; margin-top: 20px; display: none; }
+        :root { --bg: #0f0f0f; --primary: #ff0000; --text: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; padding: 20px; background: #1a1a1a; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .search-box { margin: 30px 0; width: 90%; max-width: 600px; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #333; background: #222; color: white; outline: none; }
+        button { padding: 12px 25px; border-radius: 25px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background: #cc0000; }
+        .video-wrapper { width: 90%; max-width: 900px; aspect-ratio: 16 / 9; background: #000; border-radius: 15px; overflow: hidden; display: none; margin-bottom: 50px; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .footer { font-size: 0.8rem; color: #666; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Invidious Lite Player</h1>
-        <p>인비디어스 API를 이용한 크롬북 전용 시청기</p>
-        
-        <input type="text" id="query" placeholder="검색어나 유튜브 URL을 입력하세요">
-        <button onclick="search()">검색</button>
 
-        <div id="video-container">
-            <iframe id="player" frameborder="0" allowfullscreen></iframe>
-        </div>
+    <div class="header">
+        <h2>🎥 Piped Player</h2>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="urlInput" placeholder="유튜브 링크 또는 영상 ID를 입력하세요">
+        <button onclick="loadVideo()">재생</button>
+    </div>
+
+    <div id="videoWrapper" class="video-wrapper">
+        <iframe id="player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer">
+        학교 크롬북 최적화 모드 | Piped API 사용
     </div>
 
     <script>
-        function search() {
-            const q = document.getElementById('query').value;
+        function loadVideo() {
+            const input = document.getElementById('urlInput').value.trim();
             const player = document.getElementById('player');
-            
-            // 유튜브 URL에서 ID만 추출하는 간단한 로직
-            let videoId = q;
-            if(q.includes('v=')) {
-                videoId = q.split('v=')[1].split('&')[0];
-            } else if(q.includes('youtu.be/')) {
-                videoId = q.split('youtu.be/')[1];
+            const wrapper = document.getElementById('videoWrapper');
+
+            let videoId = '';
+
+            // 유튜브 URL에서 ID 추출
+            if (input.includes('v=')) {
+                videoId = input.split('v=')[1].split('&')[0];
+            } else if (input.includes('youtu.be/')) {
+                videoId = input.split('youtu.be/')[1].split('?')[0];
+            } else {
+                videoId = input; // 직접 ID를 입력한 경우
             }
 
-            // 인비디어스 공개 인스턴스(yewtu.be)를 사용하여 영상 재생
-            player.src = `https://yewtu.be/embed/${videoId}`;
-            player.style.display = 'block';
+            if (videoId) {
+                // 파이프드 인스턴스 주소 (안 막힌 주소로 교체 가능)
+                // 기본값: piped.video (만약 이 주소가 막히면 kavin.rocks 등으로 변경)
+                const pipedInstance = "https://piped.video"; 
+                
+                player.src = `${pipedInstance}/embed/${videoId}`;
+                wrapper.style.display = 'block';
+                
+                // 화면 아래로 자동 스크롤
+                window.scrollTo({ top: wrapper.offsetTop - 20, behavior: 'smooth' });
+            } else {
+                alert('올바른 영상 ID나 링크를 입력해주세요.');
+            }
         }
+
+        // 엔터키 지원
+        document.getElementById('urlInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') loadVideo();
+        });
     </script>
 </body>
 </html>
